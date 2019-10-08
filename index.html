@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pongu</title>
+
+    <script src="scripts/ball.js"></script>
+    <script src="scripts/paddle.js"></script>
+    <script src="scripts/interact.js"></script>
+    <script src="scripts/event_handler.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/frames.js"></script>
+    <script src="scripts/index.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body onmousemove="mouseHandler(event)">
+    <br/><br/>
+    <div id="gameSelection">
+        <h5> Select Level </h5>
+    </div>
+    <div id="gameSelection">
+        <a href="?g=0" id="lnkGame0"> Game0 </a>
+        <a href="?g=1" id="lnkGame1"> Game1 </a>
+        <a href="?g=2" id="lnkGame2"> Game2 </a>
+        <a href="?g=3" id="lnkGame3"> Game3 </a>
+    </div>
+    <br/><br/>
+    <div id="midSection">
+        <div id="playerSection">
+            <h5> Select Player Mode </h5>
+            <button onclick="setPlayerMode('0')">Auto</button>
+            <br/>
+            <button onclick="setPlayerMode('1')">1P</button>
+            <br/>
+            <button onclick="setPlayerMode('2')">2P</button>
+        </div>
+        <canvas id="myCanvas" width="850" height="500" onclick="mouseClickHandler(event)"></canvas>
+        <div id="controlSection">
+            <h5> Select Control </h5>
+            <button onclick="setUserControl('m')">Mouse</button>
+            <br/>
+            <button onclick="setUserControl('k')">Keyboard</button>
+        </div>
+    </div>
+    <br/><br/>
+    <div id="contolInfo">
+        <h5>Click Or Press Space to Start / Pause the Game </h5>
+    </div>
+    <br/>
+    <div id="contolInfo">
+        <h6>Keyboard Controls: Orange -> [W] / [X] --- Blue -> [UpArrow] / [DownArrow]</h6>
+    </div>
+</body>
+
+</html>
