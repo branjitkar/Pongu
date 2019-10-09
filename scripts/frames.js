@@ -8,7 +8,7 @@ function drawBoard1() {
     ctx.beginPath();
     ctx.moveTo(canvas.width / 2, 0);
     ctx.lineTo(canvas.width / 2, canvas.height);
-    ctx.strokeStyle = "#AAA";
+    ctx.strokeStyle = "#FFF";
     ctx.stroke();
     ctx.closePath();
 }

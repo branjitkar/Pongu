@@ -19,41 +19,32 @@
 </head>
 
 <body onmousemove="mouseHandler(event)">
-    <br/><br/>
-    <div id="gameSelection">
-        <h5> Select Level </h5>
-    </div>
-    <div id="gameSelection">
-        <a href="?g=0" id="lnkGame0"> Game0 </a>
-        <a href="?g=1" id="lnkGame1"> Game1 </a>
-        <a href="?g=2" id="lnkGame2"> Game2 </a>
-        <a href="?g=3" id="lnkGame3"> Game3 </a>
-    </div>
-    <br/><br/>
-    <div id="midSection">
-        <div id="playerSection">
-            <h5> Select Player Mode </h5>
-            <button onclick="setPlayerMode('0')">Auto</button>
-            <br/>
-            <button onclick="setPlayerMode('1')">1P</button>
-            <br/>
-            <button onclick="setPlayerMode('2')">2P</button>
+    <div class="container">
+        <div class="item-level">
+            <h4 class="center"> Select Level </h4>
+            <a href="?g=0" id="lnkGame0"> Level 0 </a>
+            <a href="?g=1" id="lnkGame1"> Level 1 </a>
+            <a href="?g=2" id="lnkGame2"> Level 2 </a>
+            <a href="?g=3" id="lnkGame3"> Level 3 </a>
         </div>
-        <canvas id="myCanvas" width="850" height="500" onclick="mouseClickHandler(event)"></canvas>
-        <div id="controlSection">
-            <h5> Select Control </h5>
-            <button onclick="setUserControl('m')">Mouse</button>
-            <br/>
-            <button onclick="setUserControl('k')">Keyboard</button>
+        <div class="item-control">
+            <h4 class="center"> Select Control </h4>
+            <button class="center" onclick="setUserControl('m')">Mouse</button>
+            <button class="center" onclick="setUserControl('k')">Keyboard</button>
         </div>
-    </div>
-    <br/><br/>
-    <div id="contolInfo">
-        <h5>Click Or Press Space to Start / Pause the Game </h5>
-    </div>
-    <br/>
-    <div id="contolInfo">
-        <h6>Keyboard Controls: Orange -> [W] / [X] --- Blue -> [UpArrow] / [DownArrow]</h6>
+        <div class="item-canvas">
+            <canvas class="center" id="myCanvas" class="item-canvas" width="850" height="500" onclick="mouseClickHandler(event)"></canvas>
+        </div>
+        <div class="item-player">
+            <h4 class="center">Select Player Mode</h4>
+            <button class="center" onclick="setPlayerMode('0')">Auto</button>
+            <button class="center" onclick="setPlayerMode('1')">1P</button>
+            <button class="center" onclick="setPlayerMode('2')">2P</button>
+        </div>
+        <div class="item-info">
+            <h5 class="center">Click Or Press Space to Start / Pause the Game </h5>
+            <h6 class="center">Keyboard Controls: Orange -> [W] / [X] --- Blue -> [UpArrow] / [DownArrow]</h6>
+        </div>
     </div>
 </body>
 
