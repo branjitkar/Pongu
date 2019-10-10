@@ -103,9 +103,9 @@ function Interact(canvas, balls, paddles) {
     //Detects Ball and Canvas Collision
     this.detectCanvasCollision = function(ball, canvas) {
         let topBoundaryCollision = ball.y <= ball.radius;
-        let bottomBoundaryCollision = ball.y + ball.radius >= canvas.height;
+        let bottomBoundaryCollision = ball.y + ball.radius >= ctx.canvas.height;
         let rightBoundaryCollision = ball.x <= ball.radius;
-        let leftBoundaryCollision = ball.x + ball.radius >= canvas.width;
+        let leftBoundaryCollision = ball.x + ball.radius >= ctx.canvas.width;
 
         if (topBoundaryCollision)
             return 't';
@@ -135,7 +135,7 @@ function Interact(canvas, balls, paddles) {
     this.detectPaddleCollision = function(ball, paddles) {
         for (let i = 0; i < paddles.length; i++) {
             let collision = this.detectBallCollision(ball, paddles[i]);
-            if (this.isCollision(ball, paddles[i], false)) {
+            if (collision != 'x') {
                 this.compPaddleYOffset = undefined;
                 if (!paddles[i].isPassable) {
                     ball.dx = -ball.dx;
@@ -149,7 +149,18 @@ function Interact(canvas, balls, paddles) {
                     let tempIndex = paddles[i].index;
                     paddles[i].index = ball.paddleIndex;
                     ball.paddleIndex = tempIndex;
-                    ball.dx = -ball.dx;
+                    //reflect ball
+                    switch (collision) {
+                        case 't':
+                        case 'b':
+                            ball.dy = -ball.dy;
+                            break;
+                        case 'l':
+                        case 'r':
+                        default:
+                            ball.dx = -ball.dx;
+                            break;
+                    }
                 }
                 if (!paddles[i].isObstacle) {
                     ball.dy = (ball.y - paddles[i].y - paddles[i].height / 2) / paddles[i].height * 4;

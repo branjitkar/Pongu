@@ -14,6 +14,10 @@ var playerMode;
 function setup() {
     canvas = document.getElementById("myCanvas");
     ctx = canvas.getContext("2d");
+    //resize canvas according to window height
+    ctx.canvas.height = window.innerHeight / 1.4;
+    ctx.canvas.width = window.innerHeight * 1.28;
+
     document.addEventListener("keydown", keyDownHandler, false);
     document.addEventListener("keyup", keyUpHandler, false);
     gameSetup();

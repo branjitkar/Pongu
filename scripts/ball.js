@@ -1,11 +1,11 @@
-function Ball(x, y, r, direction) {
+function Ball(x, y, r, dx = 3, dy = 0, xdirection = 1, ydirection = 1) {
     //ball parameters
     this.x = x;
     this.y = y;
     this.radius = r;
-    this.dx = -3 * direction;
-    this.dy = 0;
-    this.dSpeed = 3;
+    this.dx = dx * xdirection;
+    this.dy = dy * ydirection;
+    this.dSpeed = 3.5;
     this.color = "#444";
     this.paddleIndex = -1;
 
