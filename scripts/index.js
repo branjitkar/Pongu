@@ -1,7 +1,7 @@
 //canvas variables
 var canvas;
 var ctx;
-var ball;
+var balls = [];
 var paddles = [];
 var interact;
 var moveObstacles = true;
@@ -17,7 +17,7 @@ function setup() {
     document.addEventListener("keydown", keyDownHandler, false);
     document.addEventListener("keyup", keyUpHandler, false);
     gameSetup();
-    interval = setInterval(draw, 7);
+    interval = setInterval(runGame, 7);
 }
 
 function gameSetup() {
@@ -33,6 +33,9 @@ function gameSetup() {
             break;
         case "3":
             game3();
+            break;
+        case "4":
+            game4();
             break;
         default:
             game0();
@@ -69,6 +72,12 @@ function gameIdFromQueryString() {
     var urlParams = new URLSearchParams(location.search);
     if (urlParams.has('g')) return urlParams.get('g');
     return;
+}
+
+function runGame() {
+    assignPaddlesToUser();
+    draw();
+    initiateInteractions();
 }
 
 //Start game

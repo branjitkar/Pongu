@@ -28,40 +28,33 @@ function drawBoard2() {
     ctx.closePath();
 }
 
-function draw() {
+function drawBalls() {
+    balls.forEach(ball => ball.draw(ctx));
+}
+
+function drawPaddles() {
+    paddles.forEach(paddle => paddle.draw(ctx));
+}
+
+function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBoard1();
-    ball.draw(ctx);
+}
+
+function draw() {
+    clearCanvas();
+    drawBoard2();
+    drawBalls();
+    drawPaddles();
+}
+
+function assignPaddlesToUser() {
     paddles[0].isComputer = !(playerMode == 1 || playerMode == 2);
     paddles[1].isComputer = !(playerMode == 2);
-    paddles.forEach((paddle) => {
-        paddle.draw(ctx);
-    });
+}
 
+function initiateInteractions() {
     if (!interact.gameStart) return;
-
-    checkWin(interact.detectCollision());
+    interact.moveBalls();
     interact.controlPaddles(controlMode);
-    //interact.controlPaddlesWithMouse();
-    ball.moveBall();
+    interact.checkWin();
 }
-
-function checkWin(result) {
-    switch (result) {
-        case 1:
-            console.log(ball.y + '-p2:' + paddles[1].y + ' - ' + (paddles[1].y + paddles[1].height))
-            alert("Orange Wins!");
-            document.location.reload();
-            clearInterval(interval);
-            break;
-        case 2:
-            console.log(ball.y + '-p2:' + paddles[0].y + ' - ' + (paddles[0].y + paddles[0].height))
-            alert("Blue Wins!");
-            document.location.reload();
-            clearInterval(interval);
-            break;
-        default:
-            break;
-    }
-}
-1

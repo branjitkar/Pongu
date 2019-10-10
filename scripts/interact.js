@@ -1,7 +1,7 @@
-function Interact(canvas, ball, paddles) {
+function Interact(canvas, balls, paddles) {
     this.canvas = canvas;
-    this.ball = ball;
     this.paddles = paddles;
+    this.balls = balls;
     this.rightPressed = false;
     this.leftPressed = false;
     this.upPressed = false;
@@ -13,6 +13,10 @@ function Interact(canvas, ball, paddles) {
     this.mouseY = -1;
     this.bricks = [];
     this.compPaddleYOffset = -1;
+
+    this.moveBalls = function() {
+        this.balls.forEach(ball => ball.moveBall());
+    }
 
     this.controlPaddles = function(controlMode) {
         if (controlMode == 'k') this.controlPaddlesWithKeyboard();
@@ -33,10 +37,14 @@ function Interact(canvas, ball, paddles) {
 
     this.autoControlPaddles = function() {
         this.paddles.forEach((paddle) => {
+            var ball = this.balls.reduce((acc, ball, index) => {
+                if (index == 0 || (Math.abs(acc.x - (paddle.x + paddle.width / 2)) > Math.abs(ball.x - (paddle.x + paddle.width / 2))))
+                    acc = ball;
+                return acc;
+            }, {});
             if (paddle.isComputer && ball.paddleIndex != paddle.index) this.compPaddleYOffset = paddle.followBall(ball, this.compPaddleYOffset);
             if (moveObstacles) paddle.oscillatePaddle(canvas);
         });
-
     }
 
     this.isCollision = function(ball, obj, isObjCanvas) {
@@ -152,13 +160,13 @@ function Interact(canvas, ball, paddles) {
     }
 
     //Contains Combined Object Collision Logics
-    this.detectCollision = function() {
-        this.detectPaddleCollision(this.ball, this.paddles);
+    this.detectCollision = function(ball) {
+        this.detectPaddleCollision(ball, this.paddles);
         //this.detectBrickCollision(this.ball, this.bricks);
-        switch (this.detectCanvasCollision(this.ball, this.canvas)) {
+        switch (this.detectCanvasCollision(ball, this.canvas)) {
             case 't':
             case 'b':
-                this.ball.dy = -this.ball.dy;
+                ball.dy = -ball.dy;
                 break;
             case 'r':
                 return 2;
@@ -170,5 +178,26 @@ function Interact(canvas, ball, paddles) {
                 break;
         }
         return 0;
+    }
+
+    this.checkWin = function() {
+        this.balls.forEach(ball => {
+            switch (this.detectCollision(ball)) {
+                case 1:
+                    console.log(ball.y + '-p2:' + paddles[1].y + ' - ' + (paddles[1].y + paddles[1].height))
+                    alert("Orange Wins!");
+                    document.location.reload();
+                    clearInterval(interval);
+                    break;
+                case 2:
+                    console.log(ball.y + '-p2:' + paddles[0].y + ' - ' + (paddles[0].y + paddles[0].height))
+                    alert("Blue Wins!");
+                    document.location.reload();
+                    clearInterval(interval);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 }
