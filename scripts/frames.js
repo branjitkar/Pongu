@@ -1,13 +1,13 @@
 function drawBoard1() {
     ctx.beginPath();
-    ctx.rect(0, canvas.height / 2 - 4, canvas.width, 8)
+    ctx.rect(0, ctx.canvas.height / 2 - 4, ctx.canvas.width, 8)
     ctx.fillStyle = "#FFF";
     ctx.fill();
     ctx.closePath();
 
     ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 0);
-    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.moveTo(ctx.canvas.width / 2, 0);
+    ctx.lineTo(ctx.canvas.width / 2, ctx.canvas.height);
     ctx.strokeStyle = "#FFF";
     ctx.stroke();
     ctx.closePath();
@@ -15,53 +15,46 @@ function drawBoard1() {
 
 function drawBoard2() {
     ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 150, 0, Math.PI * 2);
+    ctx.arc(ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 0, Math.PI * 2);
     ctx.strokeStyle = "#AAA";
     ctx.stroke();
     ctx.closePath();
 
     ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 0);
-    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.moveTo(ctx.canvas.width / 2, 0);
+    ctx.lineTo(ctx.canvas.width / 2, ctx.canvas.height);
     ctx.strokeStyle = "#AAA";
     ctx.stroke();
     ctx.closePath();
 }
 
+function drawBalls() {
+    balls.forEach(ball => ball.draw(ctx));
+}
+
+function drawPaddles() {
+    paddles.forEach(paddle => paddle.draw(ctx));
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBoard1();
-    ball.draw(ctx);
+    clearCanvas();
+    drawBoard2();
+    drawBalls();
+    drawPaddles();
+}
+
+function assignPaddlesToUser() {
     paddles[0].isComputer = !(playerMode == 1 || playerMode == 2);
     paddles[1].isComputer = !(playerMode == 2);
-    paddles.forEach((paddle) => {
-        paddle.draw(ctx);
-    });
+}
 
+function initiateInteractions() {
     if (!interact.gameStart) return;
-
-    checkWin(interact.detectCollision());
+    interact.moveBalls();
     interact.controlPaddles(controlMode);
-    //interact.controlPaddlesWithMouse();
-    ball.moveBall();
+    interact.checkWin();
 }
-
-function checkWin(result) {
-    switch (result) {
-        case 1:
-            console.log(ball.y + '-p2:' + paddles[1].y + ' - ' + (paddles[1].y + paddles[1].height))
-            alert("Orange Wins!");
-            document.location.reload();
-            clearInterval(interval);
-            break;
-        case 2:
-            console.log(ball.y + '-p2:' + paddles[0].y + ' - ' + (paddles[0].y + paddles[0].height))
-            alert("Blue Wins!");
-            document.location.reload();
-            clearInterval(interval);
-            break;
-        default:
-            break;
-    }
-}
-1
