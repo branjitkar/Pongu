@@ -31,7 +31,6 @@ function game3() {
 function game4() {
     balls.push(new Ball(canvas.width / 2 - 40, canvas.height / 2, 10, 1));
     balls.push(new Ball(canvas.width / 2 + 40, canvas.height / 2, 10, -1));
-    balls.push(new Ball(canvas.width / 2 - 60, canvas.height / 2, 10, -1));
     addControlPaddles(paddles);
     // paddles.push(new Paddle(canvas.width / 2 - 5, canvas.height / 4 - 50, 10, 100, "#555", 2, true, true));
     // paddles.push(new Paddle(canvas.width / 2 - 5, canvas.height / 2 - 50, 10, 100, "#555", 2, true, true));
