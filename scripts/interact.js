@@ -1,214 +1,250 @@
 function Interact(canvas, balls, paddles) {
-    this.canvas = canvas;
-    this.paddles = paddles;
-    this.balls = balls;
-    this.rightPressed = false;
-    this.leftPressed = false;
-    this.upPressed = false;
-    this.downPressed = false;
-    this.wPressed = false;
-    this.xPressed = false;
-    this.gameStart = false;
-    this.mouseX = -1;
-    this.mouseY = -1;
-    this.bricks = [];
-    this.compPaddleYOffset = -1;
+  this.canvas = canvas;
+  this.paddles = paddles;
+  this.balls = balls;
+  this.rightPressed = false;
+  this.leftPressed = false;
+  this.upPressed = false;
+  this.downPressed = false;
+  this.wPressed = false;
+  this.xPressed = false;
+  this.gameStart = false;
+  this.mouseX = -1;
+  this.mouseY = -1;
+  this.bricks = [];
+  this.compPaddleYOffset = -1;
 
-    this.moveBalls = function() {
-        this.balls.forEach(ball => ball.moveBall());
+  this.moveBalls = function() {
+    this.balls.forEach(ball => ball.moveBall());
+  };
+
+  this.controlPaddles = function(controlMode) {
+    if (controlMode === "k") this.controlPaddlesWithKeyboard();
+    else this.controlPaddlesWithMouse();
+    this.controlPaddlesWithKeyboard();
+    this.autoControlPaddles();
+  };
+
+  this.controlPaddlesWithKeyboard = function() {
+    if (!paddles[0].isComputer)
+      this.paddles[0].movePaddle(this.wPressed, this.xPressed);
+    if (!paddles[1].isComputer)
+      this.paddles[1].movePaddle(this.upPressed, this.downPressed);
+  };
+
+  this.controlPaddlesWithMouse = function() {
+    if (!paddles[0].isComputer)
+      this.paddles[0].movePaddleWithMouse(this.mouseX, this.mouseY, canvas);
+    if (!paddles[1].isComputer)
+      this.paddles[1].movePaddleWithMouse(this.mouseX, this.mouseY, canvas);
+  };
+
+  this.autoControlPaddles = function() {
+    this.paddles.forEach(paddle => {
+      var ball = this.balls.reduce((acc, ball, index) => {
+        if (
+          index === 0 ||
+          Math.abs(acc.x - (paddle.x + paddle.width / 2)) >
+            Math.abs(ball.x - (paddle.x + paddle.width / 2))
+        )
+          acc = ball;
+        return acc;
+      }, {});
+      if (paddle.isComputer && ball.paddleIndex !== paddle.index)
+        this.compPaddleYOffset = paddle.followBall(
+          ball,
+          this.compPaddleYOffset
+        );
+      if (moveObstacles) paddle.oscillatePaddle(canvas);
+    });
+  };
+
+  this.isCollision = function(ball, obj, isObjCanvas) {
+    if (isObjCanvas) return this.detectCanvasCollision(ball, canvas) != "x";
+    else return this.detectBallCollision(ball, obj) !== "x";
+  };
+
+  this.detectBallCollision = function(ball, obj) {
+    let objLeft = obj.x;
+    let objRight = obj.x + obj.width;
+    let objTop = obj.y;
+    let objBottom = obj.y + obj.height;
+    let objMinX = ball.x;
+    let objMinY = ball.y;
+    let side = "x";
+
+    let ballLeft = ball.x - ball.radius;
+    let ballRight = ball.x + ball.radius;
+    let ballTop = ball.x - ball.radius;
+    let ballBottom = ball.x + ball.radius;
+
+    let ballTopHit =
+      ball.x >= objLeft &&
+      ball.x <= objRight &&
+      (objBottom >= ballTop && objBottom <= ballTop + Math.abs(ball.dy));
+    let ballBottomHit =
+      ball.x >= objLeft &&
+      ball.x <= objRight &&
+      (ballBottom >= objTop && ballBottom <= objTop + Math.abs(ball.dy));
+    let ballLeftHit =
+      ball.y >= objTop &&
+      ball.y <= objBottom &&
+      (objRight >= ballLeft && objRight <= ballLeft + Math.abs(ball.dx));
+    let ballRightHit =
+      ball.y >= objTop &&
+      ball.y <= objBottom &&
+      (ballRight >= objLeft && ballRight <= objLeft + Math.abs(ball.dx));
+
+    if (ballTopHit) return "t";
+    if (ballBottomHit) return "b";
+    if (ballLeftHit) return "l";
+    if (ballRightHit) return "r";
+
+    //corner cases
+    if (ball.y <= objTop) {
+      side = "t";
+      objMinY = objTop;
+    } else if (ball.y >= objBottom) {
+      side = "b";
+      objMinY = objBottom;
+    }
+    if (ball.x <= objLeft) {
+      side = "l";
+      objMinX = objLeft;
+    } else if (ball.x >= objRight) {
+      side = "r";
+      objMinX = objRight;
     }
 
-    this.controlPaddles = function(controlMode) {
-        if (controlMode == 'k') this.controlPaddlesWithKeyboard();
-        else this.controlPaddlesWithMouse();
-        this.controlPaddlesWithKeyboard();
-        this.autoControlPaddles();
-    }
+    let xDist = ball.x - objMinX;
+    let yDist = ball.y - objMinY;
+    let dist = Math.sqrt(xDist * xDist + yDist * yDist);
 
-    this.controlPaddlesWithKeyboard = function() {
-        if (!paddles[0].isComputer) this.paddles[0].movePaddle(this.wPressed, this.xPressed);
-        if (!paddles[1].isComputer) this.paddles[1].movePaddle(this.upPressed, this.downPressed);
-    }
+    if (dist < ball.radius) return side;
+    return "x";
+  };
 
-    this.controlPaddlesWithMouse = function() {
-        if (!paddles[0].isComputer) this.paddles[0].movePaddleWithMouse(this.mouseX, this.mouseY, canvas);
-        if (!paddles[1].isComputer) this.paddles[1].movePaddleWithMouse(this.mouseX, this.mouseY, canvas);
-    }
+  //Detects Ball and Canvas Collision
+  this.detectCanvasCollision = function(ball, canvas) {
+    let topBoundaryCollision = ball.y <= ball.radius;
+    let bottomBoundaryCollision = ball.y + ball.radius >= ctx.canvas.height;
+    let rightBoundaryCollision = ball.x <= ball.radius;
+    let leftBoundaryCollision = ball.x + ball.radius >= ctx.canvas.width;
 
-    this.autoControlPaddles = function() {
-        this.paddles.forEach((paddle) => {
-            var ball = this.balls.reduce((acc, ball, index) => {
-                if (index == 0 || (Math.abs(acc.x - (paddle.x + paddle.width / 2)) > Math.abs(ball.x - (paddle.x + paddle.width / 2))))
-                    acc = ball;
-                return acc;
-            }, {});
-            if (paddle.isComputer && ball.paddleIndex != paddle.index) this.compPaddleYOffset = paddle.followBall(ball, this.compPaddleYOffset);
-            if (moveObstacles) paddle.oscillatePaddle(canvas);
-        });
-    }
+    if (topBoundaryCollision) return "t";
+    if (bottomBoundaryCollision) return "b";
+    if (rightBoundaryCollision) return "r";
+    if (leftBoundaryCollision) return "l";
+    return "x";
+  };
 
-    this.isCollision = function(ball, obj, isObjCanvas) {
-        if (isObjCanvas) return this.detectCanvasCollision(ball, canvas) != 'x';
-        else return this.detectBallCollision(ball, obj) != 'x';
-    }
-
-    this.detectBallCollision = function(ball, obj) {
-        let objLeft = obj.x;
-        let objRight = obj.x + obj.width;
-        let objTop = obj.y;
-        let objBottom = obj.y + obj.height;
-        let objMinX = ball.x;
-        let objMinY = ball.y;
-        let side = 'x';
-
-        let ballLeft = ball.x - ball.radius;
-        let ballRight = ball.x + ball.radius;
-        let ballTop = ball.x - ball.radius;
-        let ballBottom = ball.x + ball.radius;
-
-        let ballTopHit = (ball.x >= objLeft && ball.x <= objRight) && (objBottom >= ballTop && objBottom <= ballTop + Math.abs(ball.dy));
-        let ballBottomHit = (ball.x >= objLeft && ball.x <= objRight) && (ballBottom >= objTop && ballBottom <= objTop + Math.abs(ball.dy));
-        let ballLeftHit = (ball.y >= objTop && ball.y <= objBottom) && (objRight >= ballLeft && objRight <= ballLeft + Math.abs(ball.dx));
-        let ballRightHit = (ball.y >= objTop && ball.y <= objBottom) && (ballRight >= objLeft && ballRight <= objLeft + Math.abs(ball.dx));
-
-        if (ballTopHit) return 't';
-        if (ballBottomHit) return 'b';
-        if (ballLeftHit) return 'l';
-        if (ballRightHit) return 'r';
-
-        //corner cases
-        if (ball.y <= objTop) {
-            side = 't';
-            objMinY = objTop;
-        } else if (ball.y >= objBottom) {
-            side = 'b';
-            objMinY = objBottom;
+  //Detects Ball and Bricks Collision
+  this.detectBrickCollision = function(ball, bricks) {
+    for (let i = 0; i < bricks.length; i++) {
+      if (!bricks[i].isHit) {
+        if (this.isCollision(ball, bricks[i], false)) {
+          bricks[i].isHit = true;
+          return true;
         }
-        if (ball.x <= objLeft) {
-            side = 'l';
-            objMinX = objLeft;
-        } else if (ball.x >= objRight) {
-            side = 'r';
-            objMinX = objRight;
-        }
-
-        let xDist = ball.x - objMinX;
-        let yDist = ball.y - objMinY;
-        let dist = Math.sqrt(xDist * xDist + yDist * yDist);
-
-        if (dist < ball.radius) return side;
-        return 'x';
+      }
     }
+    return false;
+  };
 
-    //Detects Ball and Canvas Collision
-    this.detectCanvasCollision = function(ball, canvas) {
-        let topBoundaryCollision = ball.y <= ball.radius;
-        let bottomBoundaryCollision = ball.y + ball.radius >= ctx.canvas.height;
-        let rightBoundaryCollision = ball.x <= ball.radius;
-        let leftBoundaryCollision = ball.x + ball.radius >= ctx.canvas.width;
-
-        if (topBoundaryCollision)
-            return 't';
-        if (bottomBoundaryCollision)
-            return 'b';
-        if (rightBoundaryCollision)
-            return 'r';
-        if (leftBoundaryCollision)
-            return 'l';
-        return 'x';
-    }
-
-    //Detects Ball and Bricks Collision
-    this.detectBrickCollision = function(ball, bricks) {
-        for (let i = 0; i < bricks.length; i++) {
-            if (!bricks[i].isHit) {
-                if (this.isCollision(ball, bricks[i], false)) {
-                    bricks[i].isHit = true;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    //Detects Ball and Paddles Collision
-    this.detectPaddleCollision = function(ball, paddles) {
-        for (let i = 0; i < paddles.length; i++) {
-            let collision = this.detectBallCollision(ball, paddles[i]);
-            if (collision != 'x') {
-                this.compPaddleYOffset = undefined;
-                if (!paddles[i].isPassable) {
-                    ball.dx = -ball.dx;
-                    ball.paddleIndex = paddles[i].index;
-                } else if ((paddles[i].isPassable && ball.paddleIndex != paddles[i].index)) {
-                    //swap color
-                    let tempColor = paddles[i].color;
-                    paddles[i].color = ball.color;
-                    ball.color = tempColor;
-                    //swap index
-                    let tempIndex = paddles[i].index;
-                    paddles[i].index = ball.paddleIndex;
-                    ball.paddleIndex = tempIndex;
-                    //reflect ball
-                    switch (collision) {
-                        case 't':
-                        case 'b':
-                            ball.dy = -ball.dy;
-                            break;
-                        case 'l':
-                        case 'r':
-                        default:
-                            ball.dx = -ball.dx;
-                            break;
-                    }
-                }
-                if (!paddles[i].isObstacle) {
-                    ball.dy = (ball.y - paddles[i].y - paddles[i].height / 2) / paddles[i].height * 4;
-                    ball.color = paddles[i].color
-                }
-            }
-        }
-    }
-
-    //Contains Combined Object Collision Logics
-    this.detectCollision = function(ball) {
-        this.detectPaddleCollision(ball, this.paddles);
-        //this.detectBrickCollision(this.ball, this.bricks);
-        switch (this.detectCanvasCollision(ball, this.canvas)) {
-            case 't':
-            case 'b':
-                ball.dy = -ball.dy;
-                break;
-            case 'r':
-                return 2;
-                break;
-            case 'l':
-                return 1;
-                break;
+  //Detects Ball and Paddles Collision
+  this.detectPaddleCollision = function(ball, paddles) {
+    for (let i = 0; i < paddles.length; i++) {
+      let collision = this.detectBallCollision(ball, paddles[i]);
+      if (collision !== "x") {
+        this.compPaddleYOffset = undefined;
+        if (!paddles[i].isPassable) {
+          ball.dx = -ball.dx;
+          ball.paddleIndex = paddles[i].index;
+        } else if (
+          paddles[i].isPassable &&
+          ball.paddleIndex != paddles[i].index
+        ) {
+          //swap color
+          let tempColor = paddles[i].color;
+          paddles[i].color = ball.color;
+          ball.color = tempColor;
+          //swap index
+          let tempIndex = paddles[i].index;
+          paddles[i].index = ball.paddleIndex;
+          ball.paddleIndex = tempIndex;
+          //reflect ball
+          switch (collision) {
+            case "t":
+            case "b":
+              ball.dy = -ball.dy;
+              break;
+            case "l":
+            case "r":
             default:
-                break;
+              ball.dx = -ball.dx;
+              break;
+          }
         }
-        return 0;
+        if (!paddles[i].isObstacle) {
+          ball.dy =
+            ((ball.y - paddles[i].y - paddles[i].height / 2) /
+              paddles[i].height) *
+            4;
+          ball.color = paddles[i].color;
+        }
+      }
     }
+  };
 
-    this.checkWin = function() {
-        this.balls.forEach(ball => {
-            switch (this.detectCollision(ball)) {
-                case 1:
-                    console.log(ball.y + '-p2:' + paddles[1].y + ' - ' + (paddles[1].y + paddles[1].height))
-                    alert("Orange Wins!");
-                    document.location.reload();
-                    clearInterval(interval);
-                    break;
-                case 2:
-                    console.log(ball.y + '-p2:' + paddles[0].y + ' - ' + (paddles[0].y + paddles[0].height))
-                    alert("Blue Wins!");
-                    document.location.reload();
-                    clearInterval(interval);
-                    break;
-                default:
-                    break;
-            }
-        });
+  //Contains Combined Object Collision Logics
+  this.detectCollision = function(ball) {
+    this.detectPaddleCollision(ball, this.paddles);
+    //this.detectBrickCollision(this.ball, this.bricks);
+    switch (this.detectCanvasCollision(ball, this.canvas)) {
+      case "t":
+      case "b":
+        ball.dy = -ball.dy;
+        break;
+      case "r":
+        return 2;
+      case "l":
+        return 1;
+      default:
+        break;
     }
+    return 0;
+  };
+
+  this.checkWin = function() {
+    this.balls.forEach(ball => {
+      switch (this.detectCollision(ball)) {
+        case 1:
+          console.log(
+            ball.y +
+              "-p2:" +
+              paddles[1].y +
+              " - " +
+              (paddles[1].y + paddles[1].height)
+          );
+          alert("Orange Wins!");
+          document.location.reload();
+          clearInterval(interval);
+          break;
+        case 2:
+          console.log(
+            ball.y +
+              "-p2:" +
+              paddles[0].y +
+              " - " +
+              (paddles[0].y + paddles[0].height)
+          );
+          alert("Blue Wins!");
+          document.location.reload();
+          clearInterval(interval);
+          break;
+        default:
+          break;
+      }
+    });
+  };
 }
