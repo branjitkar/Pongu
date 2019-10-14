@@ -46,15 +46,3 @@ function draw() {
     drawBalls();
     drawPaddles();
 }
-
-function assignPaddlesToUser() {
-    paddles[0].isComputer = !(playerMode == 1 || playerMode == 2);
-    paddles[1].isComputer = !(playerMode == 2);
-}
-
-function initiateInteractions() {
-    if (!interact.gameStart) return;
-    interact.moveBalls();
-    interact.controlPaddles(controlMode);
-    interact.checkWin();
-}

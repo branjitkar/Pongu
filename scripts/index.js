@@ -1,15 +1,19 @@
-//canvas variables
+//#region global variables
 var canvas;
 var ctx;
 var balls = [];
 var paddles = [];
 var interact;
-var moveObstacles = true;
 var canvasHeight;
 var canvasWidth;
 var interval;
 var controlMode;
 var playerMode;
+
+var game;
+var interact;
+var eventHandler;
+//#endregion global variables
 
 function setup() {
     canvas = document.getElementById("myCanvas");
@@ -17,34 +21,20 @@ function setup() {
     //resize canvas according to window height
     ctx.canvas.height = window.innerHeight / 1.4;
     ctx.canvas.width = window.innerHeight * 1.28;
-
-    document.addEventListener("keydown", keyDownHandler, false);
-    document.addEventListener("keyup", keyUpHandler, false);
-    gameSetup();
+    gameSetup(canvas, gameIdFromQueryString());
     interval = setInterval(runGame, 7);
+
+    eventHandler = new EventHandler(interact);
+    document.addEventListener("keydown", onKeyDownEvent, false);
+    document.addEventListener("keyup", onKeyUpEvent, false);
 }
 
-function gameSetup() {
-    switch (gameIdFromQueryString()) {
-        case "0":
-            game0();
-            break;
-        case "1":
-            game1();
-            break;
-        case "2":
-            game2();
-            break;
-        case "3":
-            game3();
-            break;
-        case "4":
-            game4();
-            break;
-        default:
-            game0();
-            break;
-    }
+function gameSetup(canvas, gameId) {
+    game = new Game(canvas, gameId);
+    game.loadGame();
+    balls = game.balls;
+    paddles = game.paddles;
+    interact = new Interact(game.canvas, game.balls, game.paddles);
 }
 
 function setUserControl(mode) {
@@ -80,9 +70,43 @@ function gameIdFromQueryString() {
 
 function runGame() {
     assignPaddlesToUser();
-    draw();
     initiateInteractions();
+    draw();
+}
+
+function assignPaddlesToUser() {
+    paddles[0].isComputer = !(playerMode == 1 || playerMode == 2);
+    paddles[1].isComputer = !(playerMode == 2);
+}
+
+function initiateInteractions() {
+    if (!interact.gameStart) return;
+    console.log('this - ', interact.gameStart);
+    console.log('events - ', eventHandler.interact.gameStart);
+    interact.moveBalls();
+    draw();
+    interact.controlPaddles(controlMode);
+    draw();
+    interact.checkWin();
 }
 
 //Start game
 document.addEventListener('DOMContentLoaded', setup, false);
+
+//#region event handlers proxy
+function onMouseClick(e) {
+    eventHandler.mouseClickHandler(e);
+}
+
+function onMouseMove(e) {
+    eventHandler.mouseHandler(e);
+}
+
+function onKeyDownEvent(e) {
+    eventHandler.keyDownHandler(e);
+}
+
+function onKeyUpEvent(e) {
+    eventHandler.keyUpHandler(e);
+}
+//#endregion event handler proxy
