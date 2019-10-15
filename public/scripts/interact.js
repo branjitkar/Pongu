@@ -220,13 +220,11 @@ function Interact(canvas, balls, paddles) {
         this.balls.forEach(ball => {
             switch (this.detectCollision(ball)) {
                 case 1:
-                    console.log(ball.y + '-p2:' + paddles[1].y + ' - ' + (paddles[1].y + paddles[1].height))
                     alert("Orange Wins!");
                     document.location.reload();
                     clearInterval(interval);
                     break;
                 case 2:
-                    console.log(ball.y + '-p2:' + paddles[0].y + ' - ' + (paddles[0].y + paddles[0].height))
                     alert("Blue Wins!");
                     document.location.reload();
                     clearInterval(interval);

@@ -13,28 +13,40 @@ var playerMode;
 var game;
 var interact;
 var eventHandler;
+var frames;
 //#endregion global variables
+
 
 function setup() {
     canvas = document.getElementById("myCanvas");
     ctx = canvas.getContext("2d");
-    //resize canvas according to window height
-    ctx.canvas.height = window.innerHeight / 1.4;
-    ctx.canvas.width = window.innerHeight * 1.28;
+    resizeCanvas();
     gameSetup(canvas, gameIdFromQueryString());
     interval = setInterval(runGame, 7);
-
     eventHandler = new EventHandler(interact);
     document.addEventListener("keydown", onKeyDownEvent, false);
     document.addEventListener("keyup", onKeyUpEvent, false);
 }
 
+function resizeCanvas() {
+    //resize canvas according to window height
+    ctx.canvas.height = window.innerHeight * 0.8;
+    ctx.canvas.width = ctx.canvas.height * 1.6;
+
+    if (ctx.canvas.width > window.innerWidth * 0.8) {
+        ctx.canvas.width = window.innerWidth * 0.8;
+        ctx.canvas.height = ctx.canvas.width / 1.6;
+    }
+}
+
 function gameSetup(canvas, gameId) {
-    game = new Game(canvas, gameId);
+    let scale = canvas.height / 550;
+    game = new Game(canvas, gameId, scale);
     game.loadGame();
     balls = game.balls;
     paddles = game.paddles;
-    interact = new Interact(game.canvas, game.balls, game.paddles);
+    interact = new Interact(canvas, balls, paddles);
+    frames = new Frames(ctx, balls, paddles);
 }
 
 function setUserControl(mode) {
@@ -71,7 +83,7 @@ function gameIdFromQueryString() {
 function runGame() {
     assignPaddlesToUser();
     initiateInteractions();
-    draw();
+    frames.drawFrame();
 }
 
 function assignPaddlesToUser() {
@@ -81,12 +93,8 @@ function assignPaddlesToUser() {
 
 function initiateInteractions() {
     if (!interact.gameStart) return;
-    console.log('this - ', interact.gameStart);
-    console.log('events - ', eventHandler.interact.gameStart);
     interact.moveBalls();
-    draw();
     interact.controlPaddles(controlMode);
-    draw();
     interact.checkWin();
 }
 

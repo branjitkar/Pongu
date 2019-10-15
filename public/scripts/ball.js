@@ -1,11 +1,11 @@
-function Ball(x, y, r, dx = 3, dy = 0, xdirection = 1, ydirection = 1) {
+function Ball(x, y, r, dx = 3, dy = 0, speed = 3) {
     //ball parameters
     this.x = x;
     this.y = y;
     this.radius = r;
-    this.dx = dx * xdirection;
-    this.dy = dy * ydirection;
-    this.dSpeed = 3;
+    this.dx = dx;
+    this.dy = dy;
+    this.speed = speed;
     this.color = "#555";
     this.paddleIndex = -1;
 
@@ -24,7 +24,6 @@ function Ball(x, y, r, dx = 3, dy = 0, xdirection = 1, ydirection = 1) {
     }
 
     this.updateDifflection = function() {
-        this.dx = Math.sign(this.dx) * Math.sqrt(this.dSpeed * this.dSpeed - this.dy * this.dy);
-        //this.dy = Math.sign(this.dy) * Math.sqrt(this.dSpeed * this.dSpeed - this.dx * this.dx);
+        this.dx = Math.sign(this.dx) * Math.sqrt(this.speed * this.speed - this.dy * this.dy);
     }
 }

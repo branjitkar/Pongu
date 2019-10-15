@@ -1,48 +1,56 @@
-function drawBoard1() {
-    ctx.beginPath();
-    ctx.rect(0, ctx.canvas.height / 2 - 4, ctx.canvas.width, 8)
-    ctx.fillStyle = "#FFF";
-    ctx.fill();
-    ctx.closePath();
+function Frames(ctx, balls, paddles) {
+    this.ctx = ctx;
+    this.balls = balls;
+    this.paddles = paddles;
 
-    ctx.beginPath();
-    ctx.moveTo(ctx.canvas.width / 2, 0);
-    ctx.lineTo(ctx.canvas.width / 2, ctx.canvas.height);
-    ctx.strokeStyle = "#FFF";
-    ctx.stroke();
-    ctx.closePath();
-}
+    this.drawBoard1 = function() {
+        this.ctx.beginPath();
+        this.ctx.rect(0, this.ctx.canvas.height / 2 - 4, this.ctx.canvas.width, 8)
+        this.ctx.fillStyle = "#FFF";
+        this.ctx.fill();
+        this.ctx.closePath();
 
-function drawBoard2() {
-    ctx.beginPath();
-    ctx.arc(ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 0, Math.PI * 2);
-    ctx.strokeStyle = "#AAA";
-    ctx.stroke();
-    ctx.closePath();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.ctx.canvas.width / 2, 0);
+        this.ctx.lineTo(this.ctx.canvas.width / 2, this.ctx.canvas.height);
+        this.ctx.strokeStyle = "#FFF";
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
 
-    ctx.beginPath();
-    ctx.moveTo(ctx.canvas.width / 2, 0);
-    ctx.lineTo(ctx.canvas.width / 2, ctx.canvas.height);
-    ctx.strokeStyle = "#AAA";
-    ctx.stroke();
-    ctx.closePath();
-}
+    this.drawBoard2 = function() {
+        let centerRadius = 150 * this.ctx.canvas.height / 550;
 
-function drawBalls() {
-    balls.forEach(ball => ball.draw(ctx));
-}
+        this.ctx.beginPath();
+        this.ctx.arc(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2, centerRadius, 0, Math.PI * 2);
+        this.ctx.strokeStyle = "#AAA";
+        this.ctx.stroke();
+        this.ctx.closePath();
 
-function drawPaddles() {
-    paddles.forEach(paddle => paddle.draw(ctx));
-}
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.ctx.canvas.width / 2, 0);
+        this.ctx.lineTo(this.ctx.canvas.width / 2, this.ctx.canvas.height);
+        this.ctx.strokeStyle = "#AAA";
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
 
-function clearCanvas() {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-}
+    this.drawBalls = function() {
+        this.balls.forEach(ball => ball.draw(this.ctx));
+    }
 
-function draw() {
-    clearCanvas();
-    drawBoard2();
-    drawBalls();
-    drawPaddles();
+    this.drawPaddles = function() {
+        this.paddles.forEach(paddle => paddle.draw(this.ctx));
+    }
+
+    this.clearCanvas = function() {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
+
+    this.drawFrame = function() {
+        this.clearCanvas();
+        this.drawBoard2();
+        this.drawBalls();
+        this.drawPaddles();
+    }
 }
